@@ -98,7 +98,7 @@ exports.updateUserProfile = async (req, res) => {
         if (profileImageUrl !== undefined) updateData.profileImageUrl = profileImageUrl;
 
         const user = await User.findByIdAndUpdate(
-            req.user.id,
+            req.user._id,
             { $set: updateData },
             { new: true, runValidators: true }
         ).select("-password");
@@ -117,6 +117,7 @@ exports.updateUserProfile = async (req, res) => {
             },
         });
     } catch (err) {
+        console.error("Update Profile Error:", err);
         res.status(500).json({ message: "Error updating profile", error: err.message });
     }
 };
