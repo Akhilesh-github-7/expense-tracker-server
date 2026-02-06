@@ -93,20 +93,19 @@ exports.updateUserProfile = async (req, res) => {
     const { fullName, profileImageUrl } = req.body;
 
     try {
-        const user = await User.findById(req.user.id);
+        const updateData = {};
+        if (fullName) updateData.fullName = fullName;
+        if (profileImageUrl !== undefined) updateData.profileImageUrl = profileImageUrl;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select("-password");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-
-        if (fullName) user.fullName = fullName;
-        
-        // Allow updating profileImageUrl even if it's null or empty (to remove the photo)
-        if (profileImageUrl !== undefined) {
-            user.profileImageUrl = profileImageUrl;
-        }
-
-        await user.save();
 
         res.status(200).json({
             message: "Profile updated successfully",
