@@ -30,7 +30,12 @@ exports.registerUser = async(req,res)=>{
         })
         res.status(201).json({
             id:user._id,
-            user,
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                profileImageUrl: user.profileImageUrl,
+            },
             token: generateToken(user._id),
 
         })
@@ -56,11 +61,16 @@ exports.loginUser = async(req,res)=>{
         }
         res.status(200).json({
             id: user._id,
-            user,
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                profileImageUrl: user.profileImageUrl,
+            },
             token:generateToken(user._id)})
     } catch (err) {
 
-        res.status(500).json({message:"Error registering user",error: err.message})
+        res.status(500).json({message:"Error logging in",error: err.message})
     }
 }
 
@@ -69,12 +79,12 @@ exports.loginUser = async(req,res)=>{
 exports.getUserInfo = async(req,res)=>{
     try{
         const user = await User.findById(req.user.id).select("-password")
-        if(!user){npm
+        if(!user){
             return res.status(404).json({message:"User not found"})
         }
         res.status(200).json(user)
     }catch(err){
-        res.status(500).json({message:"Error registering user",error: err.message})
+        res.status(500).json({message:"Error fetching user info",error: err.message})
     }
 }
 
