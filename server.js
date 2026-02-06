@@ -2,6 +2,7 @@ require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const path = require("path")
+const fs = require("fs")
 const connectDB = require("./config/db")
 const authRoutes = require("./routes/authRoutes")
 const incomeRoutes = require("./routes/incomeRoutes")
@@ -30,8 +31,14 @@ app.use("/api/v1/income",incomeRoutes)
 app.use("/api/v1/expense",expenseRoutes)
 app.use("/api/v1/dashboard",dashboardRoutes)
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
 // server uploads folder
-app.use("/uploads",express.static(path.join(__dirname,"uploads")))
+app.use("/uploads",express.static(uploadsDir))
 
 // Global Error Handler
 app.use((err, req, res, next) => {
