@@ -88,4 +88,36 @@ exports.getUserInfo = async(req,res)=>{
     }
 }
 
+// Update User Profile
+exports.updateUserProfile = async (req, res) => {
+    const { fullName, profileImageUrl } = req.body;
 
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (fullName) user.fullName = fullName;
+        
+        // Allow updating profileImageUrl even if it's null or empty (to remove the photo)
+        if (profileImageUrl !== undefined) {
+            user.profileImageUrl = profileImageUrl;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                profileImageUrl: user.profileImageUrl,
+            },
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Error updating profile", error: err.message });
+    }
+};
